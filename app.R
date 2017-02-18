@@ -1,5 +1,5 @@
-library(shiny)
-library(ggplot2)
+require(shiny)
+require(ggplot2)
 
 # Define UI for application that draws a histogram
 shinyUI <- fluidPage(
