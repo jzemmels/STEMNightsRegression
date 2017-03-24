@@ -1,7 +1,19 @@
+
+# changes description: 
+#   data recording: add gender
+# data table: last data is added in the first row
+# only few rows are displayed
+# 
+# plot: no colors, facet by gender
+# last data added is the red point
+# make the plot interactive with plotly
+
+#==================================
 require(shiny)
 require(ggplot2)
 require(plyr)
 require(plotly)
+
 # Define UI for application that draws a histogram
 shinyUI <- fluidPage(
   # Application title
@@ -28,10 +40,7 @@ shinyUI <- fluidPage(
 shinyServer <- function(input, output){
   require(ggplot2)
   require(plyr)
-  # d <- data.frame(Height=  c(76, 69,  73, 60, 62, 68, 62, 60),
-  #                 ShoeSize=c(11, 9.5, 12, 7,  8,  6,  5,  5),
-  #                 Grade=   c(0,  1,   2,  3,  4,  5,  6,  7))
-  # write.csv(x = d, file="schooldata.csv", row.names = FALSE)
+  # read current dataset
   d <- read.csv("height_shoesizeData.csv", header=TRUE)
   
   observeEvent(input$goButton, {
