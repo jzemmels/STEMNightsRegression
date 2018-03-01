@@ -68,7 +68,8 @@ shinyServer <- function(input, output){
     # draw the histogram with the specified number of bins
    p<- ggplot(data=d, aes(x=Height, y=ShoeSize), size=I(1)) + 
      geom_point() +  geom_smooth(method = "lm",se = FALSE) + 
-     geom_point(data=d[1,], aes(x=Height, y=ShoeSize), size=I(2), color=I('red')) +
+     geom_point(aes(colour=factor(Grade))) +
+     #geom_point(data=d[1,], aes(x=Height, y=ShoeSize), size=I(2), color=I('red')) +
      facet_grid(Gender ~ .) + 
       labs(x="Height", y="Shoe Size") + 
       theme(aspect.ratio = 1, 
