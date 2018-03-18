@@ -67,16 +67,16 @@ shinyServer <- function(input, output){
     d$Gender <- revalue(d$Gender, c("F"="GIRL","M"="BOY"))
     
     # draw the histogram with the specified number of bins
-   p<- ggplot(data=d, aes(x=Height, y=ShoeSize), size=I(1)) + 
-     geom_point() +  geom_smooth(method = "lm",se = FALSE) + 
+   p <- ggplot(data=d, aes(x=Height, y=ShoeSize)) + 
+     geom_smooth(method="lm", se = FALSE) + 
      geom_point(aes(colour=Grade)) +
      #geom_point(data=d[1,], aes(x=Height, y=ShoeSize), size=I(2), color=I('red')) +
-     facet_grid(Gender ~ .) + 
-      labs(x="Height", y="Shoe Size")
-      #theme(aspect.ratio = 1, 
-            # axis.title.y = element_text(size = rel(1.8), angle = 90), 
-            # axis.title.x = element_text(size = rel(1.8), angle = 00))
-  ggplotly(p, width = 800, height = 600)
+     facet_grid(~Gender) + 
+      labs(x="Height", y="Shoe Size") + 
+      theme(aspect.ratio = 1, 
+            axis.title.y = element_text(size = rel(1.5), angle = 90), 
+            axis.title.x = element_text(size = rel(1.5), angle = 00))
+  ggplotly(p, width=800, height=600)
    })
   
 }
