@@ -64,8 +64,6 @@ shinyServer <- function(input, output){
     
     # Create the plotly plot
     output$distPlot <- renderPlotly({
-      csv.dat$Grade <- factor(csv.dat$Grade)
-      csv.dat$Gender <- factor(csv.dat$Gender)
       
       # draw the histogram with the specified number of bins
       p <- ggplot(data=plot.dat, aes(x=inches, y=ShoeSize)) +
