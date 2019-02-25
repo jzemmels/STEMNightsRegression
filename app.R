@@ -73,7 +73,8 @@ shinyServer <- function(input, output){
         geom_point(aes(colour=Grade)) +
         # geom_point(data=plot.dat[1,], aes(x=inches, y=ShoeSize), size=I(2), color=I('red')) +
         facet_grid(~Gender) +
-        labs(x="Height", y="Shoe Size")
+        labs(x="Height", y="Shoe Size") + 
+        theme_bw()
       # theme(aspect.ratio = 1,
       #       axis.title.y = element_text(size = rel(1.5), angle = 90),
       #       axis.title.x = element_text(size = rel(1.5), angle = 00))
