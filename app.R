@@ -12,10 +12,9 @@
 require(shiny)
 require(ggplot2)
 require(dplyr)
-require(plyr)
 require(plotly)
 
-# Define UI for application that draws a histogram
+# Define UI for application that draws a scatterplot
 shinyUI <- fluidPage(
   # Application title
   titlePanel("Hello Kids!"),
@@ -24,60 +23,64 @@ shinyUI <- fluidPage(
       numericInput("height", label = h3("Height (in)"), value = 1),
       numericInput("shoe", label = h3("Shoe Size (in)"), value = 1),
       selectInput("grade", label = h3("Grade"), 
-                  choices = list("Kindergarten" = 'K', "1st" = "1", "2nd" = "2", "3rd" = "3", "4th" = "4",
-                                 "5th" = "5", "6th" = "6", "Adult" = "7"), selected = 'K'),
-      selectInput("gender", label = h3("Gender"),  choices = c('F', 'M')),
-      actionButton("goButton", "Go!", class = "btn-primary")
+                  choices = list("Kindergarten", "1st", "2nd", "3rd", "4th",
+                                 "5th", "6th", "Adult"), selected = 'Kindergarten'),
+      selectInput("gender", label = h3("Sex"),  choices = c('Boy', 'Girl')),
+      actionButton("goButton", "Plot!", class = "btn-primary")
     ),
     
     # Show a plot of the generated distribution
-    mainPanel(plotlyOutput("distPlot", height='650px', width = '650px'),
+    mainPanel(plotlyOutput("distPlot", height='1000px', width = '1000px'),
               tableOutput("distTable"))
   )
 )
 
 
-# Define server logic required to draw a histogram
+# Define server logic required to draw a scatterplot
 shinyServer <- function(input, output){
   require(ggplot2)
-  require(plyr)
-  # read current dataset
-  d <- read.csv("height_shoesizeData.csv", header=TRUE)
+  require(dplyr)
+
+  # Set up NULL device
+  csv.dat <- NULL
   
+  # Only act when plot button is pressed
   observeEvent(input$goButton, {
-    d <- read.csv("height_shoesizeData.csv", header=TRUE)
-    d <- rbind(c(input$shoe, input$gender, input$grade, input$height), d)
-    write.csv(x = d, file="height_shoesizeData.csv", row.names = FALSE)
-  })
+    csv.dat <- read.csv("height_shoesizeData.csv", header=TRUE)
+    csv.dat <- rbind(c(input$shoe, input$gender, input$grade, input$height), csv.dat)
+    write.csv(x = csv.dat, file="height_shoesizeData.csv", row.names = FALSE)
+    
+    plot.dat <- csv.dat %>% 
+      mutate(Grade = as.factor(Grade),
+             Gender = as.factor(Gender),
+             ShoeSize = as.numeric(ShoeSize),
+             Height = as.numeric(Height),
+             inches = paste0(floor(Height/12), "'", Height %% 12))
+    
+    # Creates the output table
+    output$distTable <- renderTable({
+      csv.dat[1:5, ]
+    })
+    
+    # Create the plotly plot
+    output$distPlot <- renderPlotly({
+      csv.dat$Grade <- factor(csv.dat$Grade)
+      csv.dat$Gender <- factor(csv.dat$Gender)
       
-  output$distTable <- renderTable({
-    input$goButton
-    d <- read.csv("height_shoesizeData.csv", header=TRUE)
-    d$Grade <- factor(d$Grade)
-    d$Grade <- revalue(d$Grade, c("K"="Kindergarten","1"="1st","2"="2nd","3"="3rd","4"="4th","5"="5th","6"="6th","7"="Adult"))
-    d[1:5, ]
+      # draw the histogram with the specified number of bins
+      p <- ggplot(data=plot.dat, aes(x=inches, y=ShoeSize)) +
+        geom_smooth(method="lm", se = FALSE) +
+        geom_point(aes(colour=Grade)) +
+        # geom_point(data=plot.dat[1,], aes(x=inches, y=ShoeSize), size=I(2), color=I('red')) +
+        facet_grid(~Gender) +
+        labs(x="Height", y="Shoe Size")
+      # theme(aspect.ratio = 1,
+      #       axis.title.y = element_text(size = rel(1.5), angle = 90),
+      #       axis.title.x = element_text(size = rel(1.5), angle = 00))
+      ggplotly(p)
+    })
+    
   })
-    
-  output$distPlot <- renderPlotly({
-    input$goButton
-    d <- read.csv("height_shoesizeData.csv", header=TRUE)
-    d$Grade <- factor(d$Grade)
-    d$Grade <- revalue(d$Grade, c("K"="Kindergarten","1"="1st","2"="2nd","3"="3rd","4"="4th","5"="5th","6"="6th","7"="Adult"))
-    d$Gender <- factor(d$Gender)
-    d$Gender <- revalue(d$Gender, c("F"="GIRL","M"="BOY"))
-    
-    # draw the histogram with the specified number of bins
-   p <- ggplot(data=d, aes(x=Height, y=ShoeSize)) + 
-     geom_smooth(method="lm", se = FALSE) + 
-     geom_point(aes(colour=Grade)) +
-     #geom_point(data=d[1,], aes(x=Height, y=ShoeSize), size=I(2), color=I('red')) +
-     facet_grid(~Gender) + 
-      labs(x="Height", y="Shoe Size") + 
-      theme(aspect.ratio = 1, 
-            axis.title.y = element_text(size = rel(1.5), angle = 90), 
-            axis.title.x = element_text(size = rel(1.5), angle = 00))
-  ggplotly(p, width=800, height=600)
-   })
   
 }
 
