@@ -25,7 +25,7 @@ shinyUI <- fluidPage(
       selectInput("grade", label = h3("Grade"), 
                   choices = list("Kindergarten", "1st", "2nd", "3rd", "4th",
                                  "5th", "6th", "Adult"), selected = 'Kindergarten'),
-      selectInput("gender", label = h3("Sex"),  choices = c('Boy', 'Girl')),
+      selectInput("gender", label = h3("Gender"),  choices = c('Boy', 'Girl', 'Other')),
       actionButton("goButton", "Plot!", class = "btn-primary")
     ),
     
@@ -44,11 +44,13 @@ shinyServer <- function(input, output){
   # Set up NULL device
   csv.dat <- NULL
   
+  # try: 7.75,"Girl","1st",46.5
+  
   # Only act when plot button is pressed
   observeEvent(input$goButton, {
-    csv.dat <- read.csv("height_shoesizeData.csv", header=TRUE)
+    csv.dat <- read.csv("height_shoesize.csv", header=TRUE)
     csv.dat <- rbind(c(input$shoe, input$gender, input$grade, input$height), csv.dat)
-    write.csv(x = csv.dat, file="height_shoesizeData.csv", row.names = FALSE)
+    write.csv(x = csv.dat, file="height_shoesize.csv", row.names = FALSE)
     
     plot.dat <- csv.dat %>% 
       mutate(Grade = as.factor(Grade),
