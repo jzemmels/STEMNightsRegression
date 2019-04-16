@@ -68,7 +68,7 @@ shinyServer <- function(input, output){
     output$distPlot <- renderPlotly({
       
       # draw the histogram with the specified number of bins
-      p <- ggplot(data=plot.dat, aes(x=inches, y=ShoeSize)) +
+      p <- ggplot(data=plot.dat, aes(x=Height, y=ShoeSize)) +
         geom_smooth(method="lm", se = FALSE) +
         geom_point(aes(colour=Grade)) +
         # geom_point(data=plot.dat[1,], aes(x=inches, y=ShoeSize), size=I(2), color=I('red')) +
